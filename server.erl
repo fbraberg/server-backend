@@ -18,10 +18,25 @@ start_server(Max_clients) ->
 
 
 server_loop(State) ->
-     io:format("~p~n", [State#state.max_clients]),
-    server_loop(State).
+     receive
+         {ReqType, Data} -> spawn (fun() -> handle_req(self(), ReqType, Data) end);
+         Undef           -> spawn (fun() -> handle_err(Undef) end)
+     end,
+     server_loop(State).
 
+% A new state is to be taken
+ handle_req(ParentPid, stateChange, NewState) ->
 
-% Client connects
-connect(Client) ->
-    0.
+     io:fwrite("StateChange!~n");
+
+% A client wants to connect
+handle_req(ParentPid, connect, Client) ->
+    io:fwrite("Connect!~n");
+
+% A client wants to disconnect
+handle_req(ParentPid, disconnect, Client) ->
+    io:fwrite("Disconnect!~n").
+
+% An error has occured
+handle_err(Var) ->
+    io:fwrite("Error!~n").
