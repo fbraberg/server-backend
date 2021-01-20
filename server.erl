@@ -19,22 +19,25 @@ start_server(Max_clients) ->
 
 server_loop(State) ->
      receive
-         {ReqType, Data} -> spawn (fun() -> handle_req(self(), ReqType, Data) end);
+         {ReqType, Data} -> spawn (fun() -> handle_req(self(), State, ReqType, Data) end);
          Undef           -> spawn (fun() -> handle_err(Undef) end)
      end,
      server_loop(State).
 
 % A new state is to be taken
- handle_req(ParentPid, stateChange, NewState) ->
+ handle_req(ParentPid, State, stateChange, NewState) ->
 
      io:fwrite("StateChange!~n");
 
 % A client wants to connect
-handle_req(ParentPid, connect, Client) ->
-    io:fwrite("Connect!~n");
+handle_req(ParentPid, State, connect, Client) ->
+    case lists:member(Client, State#state.clients) of
+        false -> State#state.clients ++ [Client];
+        true  -> State
+    end;
 
 % A client wants to disconnect
-handle_req(ParentPid, disconnect, Client) ->
+handle_req(ParentPid, State, disconnect, Client) ->
     io:fwrite("Disconnect!~n").
 
 % An error has occured
