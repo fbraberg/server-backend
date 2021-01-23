@@ -1,16 +1,7 @@
 -module(server).
 -export([start_server/(1)]).
-
--record (state, {
-                 clients = [],
-                 max_clients
-                }).
-
--record (client, {
-                  pid,
-                  name,
-                  status
-                 }).
+-include("server.hrl").
+-include("client.hrl").
 
 start_server(Max_clients) ->
     State = #state {clients = [], max_clients = Max_clients},
