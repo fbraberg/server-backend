@@ -18,11 +18,13 @@ start_server(Max_clients) ->
 
 
 server_loop(State, ServerPid) ->
-     receive
-         {ReqType, Data} -> spawn (fun() -> handle_req(ServerPid, State, ReqType, Data) end);
-         _Undef          -> spawn (fun() -> handle_err(_Undef) end)
-     end,
-     server_loop(State, ServerPid).
+    io:fwrite("Them clients: ~p~n", [State]),
+    receive
+        {stateChange, NewState} -> server_loop(NewState, ServerPid);
+        {ReqType, Data}         -> spawn (fun() -> handle_req(ServerPid, State, ReqType, Data) end);
+        _Undef                  -> spawn (fun() -> handle_err(_Undef) end)
+    end,
+    server_loop(State, ServerPid).
 
 % A new state is to be taken
 handle_req(ServerPid, State, stateChange, NewState) ->
@@ -31,8 +33,9 @@ handle_req(ServerPid, State, stateChange, NewState) ->
 % A client wants to connect
 handle_req(ServerPid, State, connect, Client) ->
     io:fwrite("Connect!~n"),
+    C = State#state.clients,
     case lists:member(Client, State#state.clients) of
-        false -> ServerPid ! {stateChange, State#state.clients ++ [Client]}
+        false -> ServerPid ! {stateChange, State#state{clients = [Client|C]}}
     end;
 
 % A client wants to disconnect
