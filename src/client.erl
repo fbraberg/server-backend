@@ -3,7 +3,6 @@
 -include ("../inc/client.hrl").
 
 start_client(Name) ->
-    Client = #client{pid = "", name = Name, status = "2"},
-    spawn (fun() -> client_loop(Client) end).
+    spawn (fun() -> client_loop(#client{pid = self(), name = Name, status = active }) end).
 
 client_loop(Client) -> client_loop(Client).
