@@ -1,7 +1,7 @@
 -module(server).
 -export([start_server/(1)]).
--include("server.hrl").
--include("client.hrl").
+-include("../inc/server.hrl").
+-include("../inc/client.hrl").
 
 start_server(Max_clients) ->
     State = #state {clients = [], max_clients = Max_clients},
